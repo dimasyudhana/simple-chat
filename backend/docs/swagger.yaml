@@ -1,0 +1,1516 @@
+openapi: 3.0.0
+info:
+  description: |
+    This is a simple room chat server.
+  version: "1.0.0"
+  title: Simple Room Chat
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/dimasyudhana/simple-chat/1.0.0
+tags:
+    - name: authentication
+      description: User Authentication
+    - name: users
+      description: Endpoints for user management
+    - name: rooms
+      description: Endpoints for room management
+    - name: members
+      description: Endpoints for member management
+    - name: messages
+      description: Endpoints for message management
+
+paths:
+  /login:
+    post:
+      tags:
+        - authentication
+      summary: Login to system
+      description: Endpoint login user to the web-application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/users'
+            examples:
+              example1:
+                summary: Example login user id 1
+                value:
+                  email: "admin@gmail.com"
+                  password: "@Secret123"
+              example2:
+                summary: Example login user id 2
+                value:
+                  email: "peterzalai@gmail.com"
+                  password: "@Secret123"
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200Login'
+        '400':
+          $ref: '#/components/responses/Response400Login'
+        '500':
+          $ref: '#/components/responses/Response500'
+
+  /users:
+    post:
+      tags:
+        - users
+      summary: Create a new user by admin
+      description: Endpoint create a new user only for admin authority to the web-application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/users"
+            example:
+              fullname: "peterzalai"
+              email: "peterzalai@gmail.com"
+              password: "@Secret123"
+              role: "user" 
+              team: "people"
+      responses:
+        '201':
+          $ref: '#/components/responses/Response201CreateUser'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401Unauthorized'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+    put:
+      tags:
+        - users
+      summary: Update user profile by admin
+      description: Update user information by admin
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                    - Admin
+                    - User
+                  example: User
+                team_id:
+                  type: integer
+                  example: 1
+                status:
+                  type: string
+                  example: active
+                image:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200UserUpdate'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+    get:
+      tags:
+        - users
+      summary: Get list users
+      description: Get list users
+      parameters:
+        - name: fullname
+          in: query
+          description: Fullname
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: Email
+          schema:
+            type: string
+        - name: team
+          in: query
+          description: Team
+          schema:
+            type: string
+        - name: role
+          in: query
+          description: Role
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Status
+          schema:
+            type: string
+        - name: limit
+          description: limit
+          in: query
+          schema:
+            type: integer
+            example: 10
+        - name: offset
+          description: offset
+          in: query
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200UserSearch'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+  /users/{user_id}:
+    get:
+      tags:
+        - users
+      summary: Get user profile
+      description: Get user information by their ID
+      parameters:
+        - name: user_id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200GetUserProfile'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+    put:
+      tags:
+        - users
+      summary: Update user profile
+      description: Update user information by their ID, admin also have authority
+      parameters:
+        - name: user_id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                role:
+                  type: string
+                  enum:
+                    - Admin
+                    - User
+                  example: User
+                team_id:
+                  type: integer
+                  example: 1
+                status:
+                  type: boolean
+                  example: true
+                image:
+                  type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200UserUpdate'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+    delete:
+      tags:
+        - users
+      summary: Deactive user profile by admin
+      description: Deactive user information by their ID for admin only
+      parameters:
+        - name: user_id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200UserDelete'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '401':
+          $ref: '#/components/responses/Response401Unauthorized'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+  /classes:
+    post:
+      tags:
+        - rooms
+      summary: Register new class
+      description: Endpoint register new class to the web-application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/classes"
+            example:
+              name: "BE 17"
+              pic: "6e03f45c-010a-11ee-8036-e8fb1c216033"
+              start_date: "2023/03/07"
+              graduate_date: "2023/04/07"
+      responses:
+        '201':
+          $ref: '#/components/responses/Response201CreateClass'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+    get:
+      tags:
+        - rooms
+      summary: Get list classes
+      description: Get list classes
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200GetClass'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+  /classes/{class_id}:
+    get:
+      tags:
+        - rooms
+      summary: Get class by class_id
+      description: Get specific class by class_id
+      parameters:
+        - name: class_id
+          in: path
+          description: Class ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200GetClass'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+    put:
+      tags:
+        - rooms
+      summary: Update class by class_id
+      description: Update specific class by class_id
+      parameters:
+        - name: class_id
+          in: path
+          description: Class ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: BE 17
+                pic:
+                  type: string
+                  format: uuid
+                  example: 6e03f45c-010a-11ee-8036-e8fb1c216033
+                start_date:
+                  type: string
+                  format: date
+                  example: "2023-03-07"
+                graduate_date:
+                  type: string
+                  format: date
+                  example: "2023-04-07"
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200ClassUpdate'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+    delete:
+      tags:
+        - rooms
+      summary: Deactive class by class_id
+      description: Deactive specific class by class_id
+      parameters:
+        - name: class_id
+          in: path
+          description: Class ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200DeactiveClass'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+  /mentees:
+    post:
+      tags:
+        - members
+      summary: Register new mentee
+      description: Endpoint register new mentee to the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/mentees"
+            example:
+              mentee_id: "123e4567-e89b-12d3-a456-426614174000"
+              class_id: "6e03f45c-010a-11ee-8036-e8fb1c216033"
+              fullname: "frans do'o"
+              nickname: "frans"
+              phone: "+6281235288543"
+              email: "frans@example.com"
+              current_address: "Jln. Raya Canggu No 127"
+              home_address: "Jln. Raya Canggu No 127"
+              telegram: "@fransdoo"
+              gender: "Male"
+              education_type: "Informatics"
+              major: "Computer Science"
+              graduate_date: "2023-05-01"
+              institution: "University XYZ"
+              emergency_name: "Jane Do'o"
+              emergency_phone: "+1234567890"
+              emergency_status: "orang tua"
+              status: "interview"
+              image: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+      responses:
+        '201':
+          $ref: '#/components/responses/Response201CreateMentee'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+    get:
+      tags:
+        - members
+      summary: Get list mentees
+      description: Get list mentees
+      parameters:
+      - name: class
+        in: query
+        description: Class of mentees
+        required: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: Status of mentees
+        schema:
+          type: string
+      - name: category
+        in: query
+        description: Category of mentees
+        schema:
+          type: string
+          enum:
+            - informatics
+            - non-informatics
+      - name: key
+        in: query
+        description: Key parameter
+        schema:
+          type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200GetListMentees'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+  /mentees/{mentee_id}:
+    get:
+      tags:
+        - members
+      summary: Get Mentee
+      description: Get Mentee
+      parameters:
+        - name: mentee_id
+          in: path
+          description: Mentee ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200GetMenteeLog'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+    put:
+      tags:
+        - members
+      summary: Update specific mentee biodata
+      description: Update specific mentee biodata by mentee_id
+      parameters:
+        - name: mentee_id
+          in: path
+          description: Mentee ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                class_id:
+                  type: string
+                  example: 6e03f45c-010a-11ee-8036-e8fb1c216033
+                fullname:
+                  type: string
+                  example: frans do'o
+                nickname:
+                  type: string
+                  example: do'o
+                email:
+                  type: string
+                  example: doo@mail.com
+                phone:
+                  type: string
+                  example: 08123459875
+                telegram:
+                  type: string
+                  example: "@do'o"
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200UpdateMenteeLog'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+    delete:
+      tags:
+        - members
+      summary: Deactive Mentee
+      description: Deactive specific Mentees by mentee_id
+      parameters:
+        - name: mentee_id
+          in: path
+          description: Mentee ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200DeactiveMentee'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+  /mentees/{mentee_id}/feedbacks:
+    get:
+      tags:
+        - members
+      summary: Get Feedback for Mentee
+      description: Get Feedback for Mentee
+      parameters:
+        - name: mentee_id
+          in: path
+          description: Mentee ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200GetFeedbackMentee'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth : []
+
+  /feedbacks:
+    post:
+      tags:
+        - messages
+      summary: Register feedback for mentees
+      description: Endpoint register feedback for mentees to the system
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+                proof:
+                  type: string
+                user_id:
+                  type: string
+                mentee_id:
+                  type: string
+                status_id:
+                  type: integer
+      responses:
+        '201':
+          $ref: '#/components/responses/Response201CreateFeedback'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+  /feedbacks/{feedback_id}:
+    put:
+      tags:
+        - messages
+      summary: Update selected feedback for mentees
+      description: Endpoint update selected feedback for mentees to the system
+      parameters:
+        - name: feedback_id
+          in: path
+          description: Feedback ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+                proof:
+                  type: string
+                user_id:
+                  type: string
+                mentee_id:
+                  type: string
+                status_id:
+                  type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200UpdateFeedback'
+        '400':
+          $ref: '#/components/responses/Response400'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+    delete:
+      tags:
+        - messages
+      summary: Unregister specific feedback
+      description: Unregister specific feedback by feedback_id
+      parameters:
+        - name: feedback_id
+          in: path
+          description: Feedback ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/Response200UnregisterFeedback'
+        '404':
+          $ref: '#/components/responses/Response404'
+        '500':
+          $ref: '#/components/responses/Response500'
+      security:
+        - bearerAuth: []
+
+components: 
+  securitySchemes:
+    bearerAuth:           
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  requestBodies:
+
+    RequestLoginUser:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/users' 
+
+  responses:
+    Response200:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: "Successful operation"
+    
+    Response201:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 201
+              message:
+                type: string
+                example: "Successful operation"
+    
+    Response201CreateUser:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              message:
+                type: string
+            example: 
+              code: 200
+              message: "Successful created an account"
+              data:
+                user_id: "6e03f45c-010a-11ee-8036-e8fb1c216033"
+                fullname: "peterzalai"
+                email: "peterzalai@gmail.com"
+                role: "user"
+                team_id: 1
+
+    Response201CreateClass:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              message:
+                type: string
+            example: 
+              code: 200
+              message: "Successful created new class"
+              data:
+                class_id: "e487d1eb-1b94-4a1a-b88a-3c21123f888a"
+                name: "BE 17"
+                pic: "peterzalai"
+
+    Response201CreateMentee:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              message:
+                type: string
+            example: 
+              code: 200
+              message: "Successful register new mentee"
+              data:
+                mentee_id: "123e4567-e89b-12d3-a456-426614174000"
+                fullname: "frans do'o"
+                nickname: "frans"
+                email: "frans@example.com"
+                phone: "+6281235288543"
+                telegram: "@fransdoo"
+                gender: "M"
+
+    Response201CreateFeedback:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              message:
+                type: string
+            example: 
+              code: 200
+              message: "Successful add feedback"
+              data:
+                id: 1
+                notes: "Ini bagian notes untuk mentee yang bersangkutan"
+                users: "Jerry"
+                status: "Join"
+                proof: "https://images.app.goo.gl/t5b981L6oUTU3fE18"
+
+    Response200Login:
+      description: Successful login
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              message:
+                type: string
+              token:
+                type: string
+            example: 
+              code: 200
+              message: "Successful login"
+              data:
+                user_id: "6e03f45c-010a-11ee-8036-e8fb1c216033"
+                email: "admin@gmail.com"
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
+                role: "user"
+          examples:
+            Example login user id 1:
+              value:
+                code: 200
+                message: "Successful login"
+                data:
+                  user_id: "6e03f45c-010a-11ee-8036-e8fb1c216033"
+                  email: "admin@gmail.com"
+                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
+                  role: "admin"
+            Example login user id 2:
+              value:
+                code: 200
+                message: "Successful login"
+                data:
+                  user_id: "6e03f45c-010a-22ff-8036-e8fb1c2160gg"
+                  email: "peterzalai@gmail.com"
+                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBldGVyemFsYWlAZ21haWwuY29tIiwicGFzc3dvcmQiOiJAU2VjcmV0MTIzIn0.BZq48TAx5wci2LH48KW5geslrGR2ybr0-5Wol-HyDkI"
+                  role: "user"
+
+    Response200UserSearch:    
+      description: Success get list users
+      content:
+        application/json:
+          example:
+            code: 200
+            message: Successful Operation
+            data:
+              - no: 1
+                user_id: "6e03f45c-010a-11ee-8036-e8fb1c216033"
+                fullname: user1
+                email: user1@gmail.com
+                team: Academic
+                role: People
+                status: active
+                created_at: "2023/03/07"
+                updated_at: "2023/04/07"
+              - no: 2
+                user_id: "6e03f45c-010a-11ee-8036-e8fb1c216033"
+                fullname: user2
+                email: user2@gmail.com
+                team: Academic
+                role: People
+                status: non-active
+                created_at: "2023/03/20"
+                updated_at: "2023/04/07"
+              - no: 3
+                user_id: "6e03f45c-010a-11ee-8036-e8fb1c216033"
+                fullname: user3
+                email: user3@gmail.com
+                team: Academic
+                role: People
+                status: deleted
+                created_at: "2023/04/07"
+                updated_at: "2023/04/07"
+            pagination:
+              current_limit: 20
+              current_offset: 0
+              current_page: 1
+              total_data: 50
+              total_page: 3
+
+    Response200GetListClassess:    
+      description: Success get list classes
+      content:
+        application/json:
+          example:
+              code: 200
+              message: "Successful Operation"
+              data:
+              - class_id: "e487d1eb-1b94-4a1a-b88a-3c21123f888a"
+                name: "BE 17"
+                pic: "peterzalai"
+                start_date: "2023/03/07"
+                graduate_date: "2023/04/07"
+              - class_id: "f487d1eb-1b94-4a1a-b88a-3c21123f888b"
+                name: "FE 14"
+                pic: "mentor2"
+                start_date: "2023/03/07"
+                graduate_date: "2023/04/07"
+              - class_id: "f487d1eb-1b94-4a1a-b88a-3c21123f888c"
+                name: "QE 09"
+                pic: "mentor3"
+                start_date: "2023/03/07"
+                graduate_date: "2023/04/07"
+
+    Response200GetUserProfile:    
+      description: Success get spesific user data
+      content:
+        application/json:
+          example:
+              code: 200
+              message: "Successful Operation"
+              data:
+                user_id: "6e03f45c-010a-11ee-8036-e8fb1c216033"
+                username: "admin"
+                email: "admin@gmail.com"
+                team: "Academic"
+                role: "admin"
+                image: "admin.png"
+                created_at: "2023/03/07"
+                updated_at: "2023/04/07"
+
+    Response200GetClass:    
+      description: Success get specific class data
+      content:
+        application/json:
+          example:
+              code: 200
+              message: "Successful Operation"
+              data:
+                class_id: "e487d1eb-1b94-4a1a-b88a-3c21123f888a"
+                name: "BE 17"
+                pic: "peterzalai"
+                start_date: "2023/03/07"
+                graduate_date: "2023/04/07"
+
+    Response200GetListMentees:    
+      description: Success get list mentee data
+      content:
+        application/json:
+          example:
+            code: 200
+            message: "Successful Operation"
+            data:
+              - mentee_id: "123e4567-e89b-12d3-a456-426614174000"
+                class: "BE 11"
+                fullname: "M. Yusup"
+                nickname: "Yusup"
+                status: "On Class"
+                education_type: "informatics"
+                gender: "M"
+              - mentee_id: "123e4567-e89b-12d3-a456-426614174001"
+                class: "FE 8"
+                fullname: "Wendy"
+                nickname: "Wendy"
+                status: "On Class"
+                education_type: "non-informatics"
+                gender: "F"
+
+    Response200GetMenteeLog:    
+      description: Success get mentee data
+      content:
+        application/json:
+          example:
+            code: 200
+            message: "Successful Operation"
+            data:
+              mentee_id: "123e4567-e89b-12d3-a456-426614174000"
+              class: "BE 11"
+              full_name: "M. Yusup"
+              nick_name: "Yusup"
+              email: "myusup@gmail.com"
+              phone: "081234567"
+              current_address: "jl rumah saya, palembang"
+              home_address: "jl rumah saya, palembang"
+              telegram: "@daka"
+              gender: "L"
+              education_type: "non-informatics"
+              major: "akuntansi"
+              graduate: "2022"
+              institution: "SMA 1 Palembang"
+              emergency_name: "bapak ku"
+              emergency_phone: "08123457"
+              emergency_status: "orang tua"
+              feedbacks:
+                - id: 1
+                  notes: "Ini bagian notes untuk mentee yang bersangkutan"
+                  users: "Jerry"
+                  status: "Join"
+                  proof: "https://images.app.goo.gl/t5b981L6oUTU3fE18"
+                - id: 2
+                  notes: "Ini bagian notes untuk mentee yang bersangkutan"
+                  users: "Jerry"
+                  status: "Join"
+                  proof: "https://images.app.goo.gl/t5b981L6oUTU3fE18"
+
+    Response200GetFeedbackMentee:    
+      description: Success get mentee data
+      content:
+        application/json:
+          example:
+            code: 200
+            message: "Successful Operation"
+            data:
+              mentee_id: "123e4567-e89b-12d3-a456-426614174000"
+              users: "Fakhry"
+              feedbacks:
+                - feedback_id: 1
+                  status_id: 1
+                  notes: "Ini bagian notes untuk mentee yang bersangkutan 1"
+                  proof: "https://images.app.goo.gl/t5b981L6oUTU3fE18"
+                - feedback_id: 1
+                  status_id: 2
+                  notes: "Ini bagian notes untuk mentee yang bersangkutan 2"
+                  proof: "https://images.app.goo.gl/t5b981L6oUTU3fE18"
+
+    Response200UserUpdate:
+      description: User information updated successfully
+      content:
+        application/json:
+          examples:
+            example update 1:
+              summary: Example update user id 1
+              value:
+                code: 200
+                message: "Successful Operation"
+                data:
+                  username: "admin"
+                  email: "admin@gmail.com"
+                  role: "admin"
+                  team_id: 1
+                  image: "admin.png"
+                  status: active
+                  created_at: "2023/03/07"
+                  updated_at: "2023/04/07"
+            example update 2:
+              summary: Example update user id 3
+              value:
+                code: 200
+                message: "Successful Operation"
+                data:                
+                  username: "peterzalai"
+                  email: "peterzalai@gmail.com"
+                  role: "user"
+                  team_id: 1
+                  image: "peterzalai.png"
+                  status: active
+                  created_at: "2023/03/07"
+                  updated_at: "2023/04/07"
+
+    Response200ClassUpdate:
+      description: Class information updated successfully
+      content:
+        application/json:
+          example:
+            code: 200
+            message: "Successful Operation"
+            data:
+              class_id: "e487d1eb-1b94-4a1a-b88a-3c21123f888a"
+              name: "BE 17"
+              pic: "peterzalai"
+              start_date: "2023/03/07"
+              graduate_date: "2023/04/15"
+
+    Response200UpdateMenteeLog:
+      description: Mentee information updated successfully
+      content:
+        application/json:
+          example:
+            code: 200
+            message: "Successful Operation"
+            data:
+              mentee_id: "123e4567-e89b-12d3-a456-426614174000"
+              class: "BE 11"
+              full_name: "frans do'o"
+              nick_name: "do'o"
+              email: "do'o@mail.com"
+              phone: "081234567"
+              current_address: "jl rumah saya, palembang"
+              home_address: "jl rumah saya, palembang"
+              telegram: "@daka"
+              gender: "Male"
+              education_type: "Non-Informatics"
+              major: "Akuntansi"
+              graduate: "2022"
+              institution: "SMA 1 Palembang"
+              emergency_name: "bapak"
+              emergency_phone: "08123457"
+              emergency_status: "orang tua"
+
+    Response200UpdateFeedback:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+              message:
+                type: string
+            example: 
+              code: 200
+              message: "Successful add feedback"
+              data:
+                id: 1
+                notes: "Ini bagian notes untuk mentee yang bersangkutan"
+                users: "Jerry"
+                status: "Join"
+                proof: "https://images.app.goo.gl/t5b981L6oUTU3fE18"
+    
+    Response200UserDelete:
+      description: User data deleted successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: "Success Deactive an Account"
+
+    Response200DeactiveClass:
+      description: Class data deleted successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: "Success Deactive Class"
+              data:
+                type: object
+                properties:
+                  class_id:
+                    type: integer
+                    example: "e487d1eb-1b94-4a1a-b88a-3c21123f888a"
+                  name:
+                    type: string
+                    example: "BE 17"
+                  pic:
+                    type: string
+                    example: "peterzalai"
+
+    Response200DeactiveMentee:
+      description: Mentee data deleted successfully
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: "Success Deactive Mentee"
+              data:
+                type: object
+                properties:
+                  mentee_id:
+                    type: integer
+                    example: "e487d1eb-1b94-4a1a-b88a-3c21123f888a"
+                  fullname:
+                    type: string
+                    example: "frans do'o"
+                  nickname:
+                    type: string
+                    example: "do'o"
+                  email:
+                    type: string
+                    example: "do'o@mail.com"
+                  phone:
+                    type: string
+                    example: "+6281235288543"
+                  telegram:
+                    type: string
+                    example: "@do'o"
+                  gender:
+                    type: string
+                    example: "M"
+
+    Response200UnregisterFeedback:
+      description: Success unregister feedback
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 200
+              message:
+                type: string
+                example: "Success unregister feedback"
+              data:
+                type: object
+                properties:
+                  feedback_id:
+                    type: integer
+                    example: 1
+                  notes:
+                    type: string
+                    example: "Ini bagian notes"
+
+    Response400Login:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 400
+              message:
+                type: string
+                example: "Bad request, Incorrect email or password"
+
+    Response400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 400
+              message:
+                type: string
+                example: "Bad request"
+
+    Response401Unauthorized:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 401
+              message:
+                type: string
+                example: "Unauthorized access."
+
+    Response404:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 404
+              message:
+                type: string
+                example: "The requested resource was not found"
+
+    Response500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                example: 500
+              message:
+                type: string
+                example: "Internal server error"
+
+  schemas:
+    teams:
+      type: object
+      properties:
+        team_id:
+          type: integer
+        name:
+          type: string
+
+    users:
+      type: object 
+      properties: 
+        user_id: 
+          type: string
+          format: uuid 
+        username: 
+          type: string  
+        email: 
+          type: string
+          format: email
+        password: 
+          type: string
+        role: 
+          type: string
+          enum:
+            - Admin
+            - User
+        team_id:
+          type: integer
+        status:
+          type: string
+          enum:
+            - active
+            - non-active
+            - deleted
+        image: 
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        is_deleted:
+          type: boolean
+
+    mentees:
+      type: object
+      properties:
+        mentee_id:
+          type: string
+          format: uuid
+        class_id:
+          type: string
+        fullname:
+          type: string
+        nickname:
+          type: string
+        email:
+          type: string
+          format: email
+        current_address:
+          type: string
+        home_address:
+          type: string
+        telegram:
+          type: string
+        status_id:
+          type: integer
+        gender:
+          type: string
+          enum:
+            - Male
+            - Female
+        education_type:
+          type: string
+          enum:
+            - informatics
+            - non-informatics
+        major:
+          type: string
+        graduate_date:
+          type: string
+          format: date-time
+        institution:
+          type: string
+        emergency_name:
+          type: string
+        emergency_phone:
+          type: string
+        emergency_status:
+          type: string
+          enum:
+            - orang tua
+            - saudara kandung
+            - kakek nenek
+            - keluarga
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-timeF
+
+    classes:
+      type: object
+      properties:
+        class_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        start_date:
+          type: string
+          format: date-time
+        graduate_date:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    status:
+      type: object
+      properties:
+        status_id:
+          type: integer
+        name:
+          type: string
+          enum:
+            - interview
+            - join Class
+            - unit 1
+            - unit 2
+            - unit 3
+            - repeat unit 1
+            - repeat unit 2
+            - repeat unit 3
+            - placement
+            - eliminated
+            - graduated
+        parent_id:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+
+    feedbacks:
+      type: object
+      properties:
+        feedback_id:
+          type: integer
+        notes:
+          type: string
+        proof:
+          type: string
+        user_id:
+          type: string
+        mentee_id:
+          type: string
+        status_id:
+          type: string
+        approved:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
