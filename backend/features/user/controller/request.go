@@ -8,11 +8,19 @@ type RegisterRequest struct {
 	Password string `json:"password" form:"password"`
 }
 
+type LoginRequest struct {
+	Email    string `json:"email" form:"email"`
+	Password string `json:"password" form:"password"`
+}
+
 func RequestToCore(data interface{}) user.UserCore {
 	res := user.UserCore{}
 	switch v := data.(type) {
 	case RegisterRequest:
 		res.Username = v.Username
+		res.Email = v.Email
+		res.Password = v.Password
+	case LoginRequest:
 		res.Email = v.Email
 		res.Password = v.Password
 	default:

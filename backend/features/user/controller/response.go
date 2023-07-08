@@ -4,18 +4,21 @@ import "github.com/dimasyudhana/simple-chat/features/user"
 
 type RegisterResponse struct {
 	UserID string `json:"user_id,omitempty"`
-	Email  string `json:"email,omitempty"`
 }
 
-func CoreToResponse(data interface{}) RegisterResponse {
-	res := RegisterResponse{}
-	switch v := data.(type) {
-	case user.UserCore:
-		res.UserID = v.UserID
-		res.Email = v.Email
-	default:
-		return RegisterResponse{}
-	}
+type LoginResponse struct {
+	UserID string `json:"user_id,omitempty"`
+	Token  string `json:"token,omitempty"`
+}
 
-	return res
+func Register(u user.UserCore) RegisterResponse {
+	return RegisterResponse{
+		UserID: u.UserID,
+	}
+}
+
+func Login(u user.UserCore) LoginResponse {
+	return LoginResponse{
+		UserID: u.UserID,
+	}
 }

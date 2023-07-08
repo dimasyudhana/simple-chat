@@ -63,5 +63,34 @@ func (uq *Query) Register(request user.UserCore) (user.UserCore, error) {
 
 // Login implements user.UserData.
 func (uq *Query) Login(request user.UserCore) (user.UserCore, string, error) {
-	panic("unimplemented")
+	result := User{}
+	query := uq.db.Raw(`
+		SELECT user_id, email, password
+		FROM users
+		WHERE email = ?
+		LIMIT 1
+	`, request.Email).Scan(&result)
+	if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+		log.Error("user record not found")
+		return user.UserCore{}, "", errors.New("invalid email and password")
+	}
+
+	rowAffect := query.RowsAffected
+	if rowAffect == 0 {
+		log.Warn("no row affected")
+		return user.UserCore{}, "", errors.New("no row affected")
+	}
+
+	if !password.MatchPassword(request.Password, result.Password) {
+		return user.UserCore{}, "", errors.New("password does not match")
+	}
+
+	token, err := middlewares.GenerateToken(result.UserID)
+	if err != nil {
+		log.Error("error while creating jwt token")
+		return user.UserCore{}, "", errors.New("error while creating jwt token")
+	}
+
+	log.Sugar().Infof("user has been logged in: %s", result.UserID)
+	return modelToCore(result), token, nil
 }
