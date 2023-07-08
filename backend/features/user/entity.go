@@ -37,6 +37,7 @@ type MessageCore struct {
 type Controller interface {
 	Register() gin.HandlerFunc
 	Login() gin.HandlerFunc
+	Logout() gin.HandlerFunc
 }
 
 type UseCase interface {

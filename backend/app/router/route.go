@@ -10,8 +10,8 @@ import (
 )
 
 func InitRouter(db *gorm.DB, r *gin.Engine) {
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
+	// r.Use(gin.Logger())
+	// r.Use(gin.Recovery())
 
 	initUserRouter(db, r)
 }
@@ -21,6 +21,7 @@ func initUserRouter(db *gorm.DB, r *gin.Engine) {
 	userUsecase := uu.New(userRepository)
 	userController := uc.New(userUsecase)
 
-	r.POST("/register", userController.Register())
-	// r.POST("/login", userController.Login())
+	r.POST("/signup", userController.Register())
+	r.POST("/login", userController.Login())
+	r.GET("/logout", userController.Logout())
 }
