@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	r := gin.New()
+	r := gin.Default()
 	cfg := config.InitConfig()
 	db := database.InitDatabase(cfg)
 	database.InitMigration(db)
