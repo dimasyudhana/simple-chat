@@ -4,6 +4,7 @@ import (
 	"github.com/dimasyudhana/simple-chat/app/config"
 	"github.com/dimasyudhana/simple-chat/app/database"
 	"github.com/dimasyudhana/simple-chat/app/router"
+	websockets "github.com/dimasyudhana/simple-chat/utils/websocket"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,5 +14,6 @@ func main() {
 	db := database.InitDatabase(cfg)
 	database.InitMigration(db)
 	router.InitRouter(db, r)
+	go websockets.NewHub().Run()
 	r.Run(":8080")
 }
