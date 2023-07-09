@@ -1,6 +1,0 @@
-*.idea
-.vscode
-config.yaml
-Makefile
-cover.out
-mockery.sh
