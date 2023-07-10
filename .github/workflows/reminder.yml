@@ -14,3 +14,9 @@ jobs:
 
       - name: remind developers
         run: echo "Remember to stay on updating something new for this repository!"
+        
+      - name: Send Email Notification
+        run: |
+          echo "Subject: Reminder - update something new" | \
+          /usr/sbin/sendmail -S ${{ secrets.SMTP_SERVER }}:${{ secrets.SMTP_PORT }} -au ${{ secrets.SMTP_USERNAME }} -ap ${{ secrets.SMTP_PASSWORD }} -f ${{ secrets.EMAIL_FROM }} ${{ secrets.EMAIL_TO }}
+
