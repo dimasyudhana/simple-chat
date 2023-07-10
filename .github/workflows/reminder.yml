@@ -16,7 +16,17 @@ jobs:
         run: echo "Remember to stay on updating something new for this repository!"
         
       - name: Send Email Notification
+        env:
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
         run: |
-          echo "Subject: Reminder - update something new" | \
-          /usr/sbin/sendmail -S ${{ secrets.SMTP_SERVER }}:${{ secrets.SMTP_PORT }} -au ${{ secrets.SMTP_USERNAME }} -ap ${{ secrets.SMTP_PASSWORD }} -f ${{ secrets.EMAIL_FROM }} ${{ secrets.EMAIL_TO }}
-
+          echo "Subject: Reminder - Update Something New" | \
+          /usr/sbin/sendmail -S $SMTP_SERVER:$SMTP_PORT \
+                            -au $SMTP_USERNAME \
+                            -ap $SMTP_PASSWORD \
+                            -f $EMAIL_FROM \
+                            $EMAIL_TO
