@@ -1,0 +1,16 @@
+name: reminder
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+
+jobs:
+  reminder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: set up git repository
+        uses: actions/checkout@v2
+
+      - name: remind developers
+        run: echo "Remember to stay on updating something new for this repository!"
