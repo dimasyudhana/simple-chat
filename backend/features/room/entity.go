@@ -1,6 +1,10 @@
 package room
 
-import "time"
+import (
+	"time"
+
+	"github.com/gin-gonic/gin"
+)
 
 type RoomCore struct {
 	RoomID    string
@@ -26,4 +30,15 @@ type MessageCore struct {
 	Message   string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+}
+
+type Controller interface {
+	Register() gin.HandlerFunc
+	Join() gin.HandlerFunc
+}
+
+type UseCase interface {
+}
+
+type Repository interface {
 }

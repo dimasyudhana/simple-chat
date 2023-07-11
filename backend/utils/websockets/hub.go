@@ -14,7 +14,7 @@ type Hub struct {
 }
 
 // create constructor
-func NewHub() *Hub {
+func New() *Hub {
 	return &Hub{
 		Rooms:      make(map[string]*Room),
 		Register:   make(chan *Member),
