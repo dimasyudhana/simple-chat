@@ -1,8 +1,13 @@
 package websockets
 
 import (
+	"net/http"
+
+	"github.com/dimasyudhana/simple-chat/app/middlewares"
 	"github.com/gorilla/websocket"
 )
+
+var log = middlewares.Log()
 
 type Member struct {
 	Connection *websocket.Conn
@@ -16,6 +21,14 @@ type Message struct {
 	Content  string `json:"content"`
 	RoomID   string `json:"room_id"`
 	Username string `json:"username"`
+}
+
+var Upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 func (c *Member) WriteMessage() {
