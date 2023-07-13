@@ -7,10 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
+	rc "github.com/dimasyudhana/simple-chat/features/room/controller"
+	rr "github.com/dimasyudhana/simple-chat/features/room/repository"
+	ru "github.com/dimasyudhana/simple-chat/features/room/usecase"
 	uc "github.com/dimasyudhana/simple-chat/features/user/controller"
 	ur "github.com/dimasyudhana/simple-chat/features/user/repository"
 	uu "github.com/dimasyudhana/simple-chat/features/user/usecase"
-	websockets "github.com/dimasyudhana/simple-chat/utils/websocket"
+	"github.com/dimasyudhana/simple-chat/utils/websockets"
 )
 
 func InitRouter(db *gorm.DB, r *gin.Engine) {
@@ -27,7 +30,7 @@ func InitRouter(db *gorm.DB, r *gin.Engine) {
 	}))
 
 	initUserRouter(db, r)
-	initWebsocketRoutes(r)
+	initRoomRouter(db, r)
 }
 
 func initUserRouter(db *gorm.DB, r *gin.Engine) {
@@ -40,10 +43,12 @@ func initUserRouter(db *gorm.DB, r *gin.Engine) {
 	r.GET("/logout", userController.Logout())
 }
 
-func initWebsocketRoutes(r *gin.Engine) {
-	hub := websockets.NewHub()
-	websocketHandler := websockets.NewHandler(hub)
+func initRoomRouter(db *gorm.DB, r *gin.Engine) {
+	roomRepository := rr.New(db)
+	roomUsecase := ru.New(roomRepository)
+	ws := websockets.New()
+	roomController := rc.New(roomUsecase, ws)
 
-	r.POST("/rooms/register", websocketHandler.RegisterRoom())
-	r.GET("/rooms/:roomId/join", websocketHandler.JoinRoom())
+	r.POST("/rooms/register", roomController.Register())
+	r.GET("/rooms/:id/join", roomController.Join())
 }
