@@ -9,7 +9,7 @@ type RegisterRequest struct {
 }
 
 type LoginRequest struct {
-	Email    string `json:"email" form:"email"`
+	Username string `json:"username" form:"username"`
 	Password string `json:"password" form:"password"`
 }
 
@@ -21,7 +21,7 @@ func RequestToCore(data interface{}) user.UserCore {
 		res.Email = v.Email
 		res.Password = v.Password
 	case LoginRequest:
-		res.Email = v.Email
+		res.Username = v.Username
 		res.Password = v.Password
 	default:
 		return user.UserCore{}

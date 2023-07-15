@@ -54,17 +54,17 @@ func (us *Service) Register(request user.UserCore) (user.UserCore, error) {
 
 // Login implements user.UseCase.
 func (us *Service) Login(request user.UserCore) (user.UserCore, string, error) {
-	if request.Email == "" || request.Password == "" {
-		log.Error("email and password cannot be empty")
-		return user.UserCore{}, "", errors.New("email and password cannot be empty")
+	if request.Username == "" || request.Password == "" {
+		log.Error("username and password cannot be empty")
+		return user.UserCore{}, "", errors.New("username and password cannot be empty")
 	}
 
 	result, token, err := us.query.Login(request)
 	if err != nil {
 		message := ""
-		if strings.Contains(err.Error(), "invalid email and password") {
-			log.Error("invalid email and password")
-			message = "invalid email and password"
+		if strings.Contains(err.Error(), "invalid username and password") {
+			log.Error("invalid username and password")
+			message = "invalid username and password"
 		} else if strings.Contains(err.Error(), "password does not match") {
 			log.Error("password does not match")
 			message = "password does not match"

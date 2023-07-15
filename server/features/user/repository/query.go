@@ -65,11 +65,11 @@ func (uq *Query) Register(request user.UserCore) (user.UserCore, error) {
 func (uq *Query) Login(request user.UserCore) (user.UserCore, string, error) {
 	result := User{}
 	query := uq.db.Raw(`
-		SELECT user_id, email, password
+		SELECT user_id, username, password
 		FROM users
-		WHERE email = ?
+		WHERE users.username = ?
 		LIMIT 1
-	`, request.Email).Scan(&result)
+	`, request.Username).Scan(&result)
 	if errors.Is(query.Error, gorm.ErrRecordNotFound) {
 		log.Error("user record not found")
 		return user.UserCore{}, "", errors.New("invalid email and password")
