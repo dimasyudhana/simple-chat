@@ -70,17 +70,55 @@ func (h *Controller) Join() gin.HandlerFunc {
 			Username: username,
 		}
 
-		// Register a new member through the register channel
 		h.hub.Register <- cl
-
-		// Broadcast that message
 		h.hub.Broadcast <- m
-
-		// Write message
 		go cl.WriteMessage()
-		// Read message
-		go cl.ReadMessage(h.hub)
-		// wait message Quit from members
-		<-cl.Quit
+		cl.ReadMessage(h.hub)
+	}
+}
+
+type RoomResponse struct {
+	RoomID   string `json:"room_id"`
+	RoomName string `json:"room_name"`
+}
+
+func (h *Controller) GetRooms() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		rooms := make([]RoomResponse, 0)
+
+		for _, r := range h.hub.Rooms {
+			rooms = append(rooms, RoomResponse{
+				RoomID:   r.RoomID,
+				RoomName: r.RoomName,
+			})
+		}
+
+		c.JSON(http.StatusOK, rooms)
+	}
+}
+
+type MemberResponse struct {
+	RoomID   string `json:"room_id"`
+	Username string `json:"username"`
+}
+
+func (h *Controller) GetMembers() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var members []MemberResponse
+		roomId := c.Param("room_id")
+
+		if _, ok := h.hub.Rooms[roomId]; !ok {
+			members = make([]MemberResponse, 0)
+			c.JSON(http.StatusOK, members)
+		}
+
+		for _, c := range h.hub.Rooms[roomId].Members {
+			members = append(members, MemberResponse{
+				RoomID:   c.RoomID,
+				Username: c.Username,
+			})
+		}
+
+		c.JSON(http.StatusOK, members)
 	}
 }

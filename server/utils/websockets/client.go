@@ -15,7 +15,6 @@ type Member struct {
 	UserID     string `json:"user_id"`
 	RoomID     string `json:"room_id"`
 	Username   string `json:"username"`
-	Quit       chan bool
 }
 
 type Message struct {
@@ -69,11 +68,4 @@ func (c *Member) ReadMessage(hub *Hub) {
 
 		hub.Broadcast <- msg
 	}
-}
-
-func (c *Member) Close(hub *Hub) {
-	hub.Unregister <- c
-	c.Connection.Close()
-	close(c.Message)
-	c.Quit <- true
 }

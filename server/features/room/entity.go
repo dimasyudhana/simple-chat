@@ -35,6 +35,8 @@ type MessageCore struct {
 type Controller interface {
 	Register() gin.HandlerFunc
 	Join() gin.HandlerFunc
+	GetRooms() gin.HandlerFunc
+	GetMembers() gin.HandlerFunc
 }
 
 type UseCase interface {

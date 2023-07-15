@@ -49,5 +49,7 @@ func initRoomRouter(db *gorm.DB, r *gin.Engine, hub *websockets.Hub) {
 	roomController := rc.New(roomUsecase, hub)
 
 	r.POST("/rooms/register", roomController.Register())
-	r.GET("/rooms/:id/join", roomController.Join())
+	r.GET("/rooms/:room_id/join", roomController.Join())
+	r.GET("/rooms", roomController.GetRooms())
+	r.GET("/rooms/:room_id", roomController.GetMembers())
 }
