@@ -12,8 +12,9 @@ func main() {
 	r := gin.Default()
 	cfg := config.InitConfig()
 	db := database.InitDatabase(cfg)
+	hub := websockets.New()
 	database.InitMigration(db)
-	router.InitRouter(db, r)
-	go websockets.New().Run()
+	router.InitRouter(db, r, hub)
+	go hub.Run()
 	r.Run(":8080")
 }

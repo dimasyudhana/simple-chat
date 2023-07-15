@@ -16,7 +16,7 @@ import (
 	"github.com/dimasyudhana/simple-chat/utils/websockets"
 )
 
-func InitRouter(db *gorm.DB, r *gin.Engine) {
+func InitRouter(db *gorm.DB, r *gin.Engine, hub *websockets.Hub) {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000"},
 		AllowMethods:     []string{"GET", "POST"},
@@ -30,7 +30,7 @@ func InitRouter(db *gorm.DB, r *gin.Engine) {
 	}))
 
 	initUserRouter(db, r)
-	initRoomRouter(db, r)
+	initRoomRouter(db, r, hub)
 }
 
 func initUserRouter(db *gorm.DB, r *gin.Engine) {
@@ -43,11 +43,10 @@ func initUserRouter(db *gorm.DB, r *gin.Engine) {
 	r.GET("/logout", userController.Logout())
 }
 
-func initRoomRouter(db *gorm.DB, r *gin.Engine) {
+func initRoomRouter(db *gorm.DB, r *gin.Engine, hub *websockets.Hub) {
 	roomRepository := rr.New(db)
 	roomUsecase := ru.New(roomRepository)
-	ws := websockets.New()
-	roomController := rc.New(roomUsecase, ws)
+	roomController := rc.New(roomUsecase, hub)
 
 	r.POST("/rooms/register", roomController.Register())
 	r.GET("/rooms/:id/join", roomController.Join())
