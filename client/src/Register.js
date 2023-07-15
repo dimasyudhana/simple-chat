@@ -54,7 +54,7 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         const v1 = USER_REGEX.test(username);
         const v2 = EMAIL_REGEX.test(email);
         const v3 = PWD_REGEX.test(password);
@@ -62,9 +62,9 @@ const Register = () => {
             setErrMsg("Invalid Entry");
             return;
         }
-
+    
         try {
-            const response = await axios.post(REGISTER_URL,
+            await axios.post(REGISTER_URL,
                 JSON.stringify({ username, email, password }),
                 {
                     headers: { 'Content-Type': 'application/json' },
@@ -87,6 +87,7 @@ const Register = () => {
             errRef.current.focus();
         }
     }
+    
 
     return (
         <>
