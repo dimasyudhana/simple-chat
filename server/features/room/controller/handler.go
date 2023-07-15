@@ -79,6 +79,8 @@ func (h *Controller) Join() gin.HandlerFunc {
 		// Write message
 		go cl.WriteMessage()
 		// Read message
-		cl.ReadMessage(h.hub)
+		go cl.ReadMessage(h.hub)
+		// wait message Quit from members
+		<-cl.Quit
 	}
 }
