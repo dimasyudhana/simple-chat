@@ -77,11 +77,6 @@ func (h *Controller) Join() gin.HandlerFunc {
 	}
 }
 
-type RoomResponse struct {
-	RoomID   string `json:"room_id"`
-	RoomName string `json:"room_name"`
-}
-
 func (h *Controller) GetRooms() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		rooms := make([]RoomResponse, 0)
@@ -95,11 +90,6 @@ func (h *Controller) GetRooms() gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, rooms)
 	}
-}
-
-type MemberResponse struct {
-	RoomID   string `json:"room_id"`
-	Username string `json:"username"`
 }
 
 func (h *Controller) GetMembers() gin.HandlerFunc {
